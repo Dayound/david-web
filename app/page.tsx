@@ -51,10 +51,7 @@ export default function Home() {
           Qué hago
         </h2>
         <p className="mt-4 text-lg leading-8">
-          Acabo de entrar en el equipo de Jesús D. López Tecnología. Estoy
-          aprendiendo a construir con Claude, desde la terminal hasta publicar
-          mis propias apps, con un objetivo claro: hacer realidad mis ideas de
-          juegos.
+          Probando, probando.
         </p>
       </section>
 
