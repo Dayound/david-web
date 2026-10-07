@@ -1,69 +1,101 @@
-import Image from "next/image";
+import BotonTema from "./boton-tema";
+
+// Una tarjeta para cada idea de juego. Se escribe una vez y se usa tres veces:
+// eso es un componente.
+function Idea({
+  nombre,
+  frase,
+  nivel,
+}: {
+  nombre: string;
+  frase: string;
+  nivel: string;
+}) {
+  return (
+    <li className="rounded-xl border border-black/10 p-5 dark:border-white/15">
+      <div className="flex items-baseline justify-between gap-4">
+        <h3 className="text-lg font-semibold tracking-tight">{nombre}</h3>
+        <span className="text-xs uppercase tracking-widest text-zinc-500">
+          {nivel}
+        </span>
+      </div>
+      <p className="mt-2 text-zinc-600 dark:text-zinc-400">{frase}</p>
+    </li>
+  );
+}
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <main className="mx-auto w-full max-w-2xl flex-1 px-6 py-16 sm:py-24">
+      <div className="flex justify-end">
+        <BotonTema />
+      </div>
+
+      {/* Cabecera: el círculo con las iniciales es provisional hasta que haya foto */}
+      <header className="mt-10 flex items-center gap-5">
+        <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-zinc-200 text-2xl font-semibold text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
+          DV
+        </div>
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight">
+            David Villalba
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="mt-1 text-zinc-600 dark:text-zinc-400">
+            Aprendiendo a construir juegos y apps con Claude.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+      </header>
+
+      <section className="mt-16">
+        <h2 className="text-sm uppercase tracking-widest text-zinc-500">
+          Qué hago
+        </h2>
+        <p className="mt-4 text-lg leading-8">
+          Acabo de entrar en el equipo de Jesús D. López Tecnología. Estoy
+          aprendiendo a construir con Claude, desde la terminal hasta publicar
+          mis propias apps, con un objetivo claro: hacer realidad mis ideas de
+          juegos.
+        </p>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="text-sm uppercase tracking-widest text-zinc-500">
+          Mis ideas de juegos
+        </h2>
+        <ul className="mt-4 space-y-4">
+          <Idea
+            nombre="VERBUM"
+            nivel="Nivel 1"
+            frase="Una palabra al día, seis intentos. Abrir, jugar, descubrir la palabra."
+          />
+          <Idea
+            nombre="App HIIT"
+            nivel="Nivel 2"
+            frase="No pienses qué entrenar. Abre la app y entrena."
+          />
+          <Idea
+            nombre="WHAT IF?"
+            nivel="Nivel 3"
+            frase="El desarrollador diseña el problema. El jugador diseña la solución."
+          />
+        </ul>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="text-sm uppercase tracking-widest text-zinc-500">
+          Contacto
+        </h2>
+        <p className="mt-4 text-lg">
           <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
+            href="https://github.com/dayound"
             target="_blank"
             rel="noopener noreferrer"
+            className="underline underline-offset-4 hover:text-zinc-500"
           >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
+            GitHub · dayound
           </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+        </p>
+      </section>
+    </main>
   );
 }
