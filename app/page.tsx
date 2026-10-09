@@ -1,3 +1,4 @@
+import Link from "next/link";
 import BotonTema from "./boton-tema";
 
 // Una tarjeta para cada idea de juego. Se escribe una vez y se usa tres veces:
@@ -76,6 +77,20 @@ export default function Home() {
             frase="El desarrollador diseña el problema. El jugador diseña la solución."
           />
         </ul>
+      </section>
+
+      <section className="mt-16">
+        <h2 className="text-sm uppercase tracking-widest text-zinc-500">
+          Marcador
+        </h2>
+        <p className="mt-4 text-lg">
+          <Link
+            href="/marcador"
+            className="underline underline-offset-4 hover:text-zinc-500"
+          >
+            Apunta tu puntuación y mira el top 10 →
+          </Link>
+        </p>
       </section>
 
       <section className="mt-16">
