@@ -3,7 +3,7 @@ import Link from "next/link";
 import { io } from "next/cache";
 import BotonTema from "../boton-tema";
 import { retoDelDia } from "./palabras";
-import Tablero from "./tablero";
+import Juego from "./juego";
 
 export const metadata = { title: "VERBUM · David Villalba" };
 
@@ -54,7 +54,7 @@ async function RetoDeHoy({ searchParams }: Pick<PageProps<"/verbum">, "searchPar
         <span className="text-zinc-500"> · {letras} letras</span>
       </p>
       <div className="mt-8">
-        <Tablero intentos={INTENTOS} letras={letras} />
+        <Juego intentos={INTENTOS} letras={letras} />
       </div>
     </>
   );

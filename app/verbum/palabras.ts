@@ -1,3 +1,9 @@
+// Este archivo solo puede usarse en el servidor: si algún día se importa desde
+// un componente de cliente, la web no se construye y así la lista nunca llega
+// al navegador.
+import "server-only";
+import { normalizar } from "./texto";
+
 // La lista de retos de VERBUM: cada día toca el siguiente, en orden.
 // Cuando se acaba la lista, vuelve a empezar por el primero.
 //
@@ -24,16 +30,6 @@ export const PRIMER_DIA = "2026-10-09";
 // A partir de aquí no hace falta tocar nada para añadir palabras.
 
 export type Reto = { pista: string; palabra: string };
-
-// Pasa una palabra a mayúsculas y le quita las tildes, pero deja la Ñ.
-// "Árbol" → "ARBOL", "montaña" → "MONTAÑA".
-export function normalizar(texto: string): string {
-  return texto
-    .toUpperCase()
-    .normalize("NFD") // separa cada letra de su tilde: Á → A + ´, Ñ → N + ~
-    .replace(/[̀-ͯ]/g, (marca) => (marca === "̃" ? marca : "")) // borra todas menos la ~
-    .normalize("NFC"); // vuelve a juntar N + ~ → Ñ
-}
 
 // La fecha de hoy en España, como "2026-10-09". Así el día cambia
 // a medianoche de aquí, esté donde esté el servidor.
