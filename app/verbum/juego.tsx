@@ -4,7 +4,7 @@ import { useEffect, useState, useTransition } from "react";
 import { comprobarIntento } from "./acciones";
 import Tablero, { type Intento } from "./tablero";
 import Teclado from "./teclado";
-import { esLetra, normalizar, type Color } from "./texto";
+import { esLetra, INTENTOS, normalizar, type Color } from "./texto";
 
 const PRIORIDAD: Record<Color, number> = { gris: 1, amarillo: 2, verde: 3 };
 
@@ -23,6 +23,7 @@ export default function Juego({
   const [enviados, setEnviados] = useState<Intento[]>([]);
   const [actual, setActual] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [palabra, setPalabra] = useState(""); // solo llega si se pierde
   const [comprobando, empezarComprobacion] = useTransition();
 
   const acertado = enviados.some((e) => e.colores.every((c) => c === "verde"));
@@ -58,14 +59,16 @@ export default function Juego({
       return;
     }
     const texto = actual;
+    const numero = enviados.length + 1;
     empezarComprobacion(async () => {
-      const respuesta = await comprobarIntento(fecha, texto);
+      const respuesta = await comprobarIntento(fecha, texto, numero);
       if (!respuesta.ok) {
         setMensaje(respuesta.mensaje);
         return;
       }
       setEnviados((e) => [...e, { texto, colores: respuesta.colores }]);
       setActual("");
+      if (respuesta.palabra) setPalabra(respuesta.palabra);
     });
   }
 
@@ -89,17 +92,17 @@ export default function Juego({
 
   return (
     <div className="flex flex-col gap-6">
+      {terminado && (
+        <MensajeFinal acertado={acertado} usados={enviados.length} palabra={palabra} />
+      )}
+
       <Tablero intentos={intentos} letras={letras} enviados={enviados} actual={actual} />
 
-      <p aria-live="polite" className="min-h-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-        {acertado
-          ? "¡Acertaste!"
-          : terminado
-            ? "Has usado los seis intentos."
-            : comprobando
-              ? "Comprobando…"
-              : mensaje}
-      </p>
+      {!terminado && (
+        <p aria-live="polite" className="min-h-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+          {comprobando ? "Comprobando…" : mensaje}
+        </p>
+      )}
 
       <Teclado
         colores={coloresTeclado}
@@ -107,6 +110,46 @@ export default function Juego({
         onBorrar={borrar}
         onEnviar={enviar}
       />
+    </div>
+  );
+}
+
+// El cartel del final de la partida: has ganado (y en cuántos intentos)
+// o has perdido (y cuál era la palabra).
+function MensajeFinal({
+  acertado,
+  usados,
+  palabra,
+}: {
+  acertado: boolean;
+  usados: number;
+  palabra: string;
+}) {
+  return (
+    <div
+      role="status"
+      className={`rounded-xl border-2 p-5 text-center ${
+        acertado ? "border-green-600" : "border-black/15 dark:border-white/20"
+      }`}
+    >
+      <p className="text-2xl font-semibold tracking-tight">
+        {acertado ? "¡Acertaste!" : "¡Casi!"}
+      </p>
+      <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+        {acertado ? (
+          usados === 1 ? (
+            "A la primera. Impresionante."
+          ) : (
+            `Lo has descubierto en ${usados} de ${INTENTOS} intentos.`
+          )
+        ) : (
+          <>
+            La palabra era{" "}
+            <span className="font-bold tracking-widest text-foreground">{palabra}</span>.
+          </>
+        )}
+      </p>
+      <p className="mt-3 text-sm text-zinc-500">Vuelve mañana para un nuevo reto.</p>
     </div>
   );
 }

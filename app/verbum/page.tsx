@@ -4,10 +4,9 @@ import { io } from "next/cache";
 import BotonTema from "../boton-tema";
 import { retoDelDia } from "./palabras";
 import Juego from "./juego";
+import { INTENTOS } from "./texto";
 
 export const metadata = { title: "VERBUM · David Villalba" };
-
-const INTENTOS = 6;
 
 export default function Verbum({ searchParams }: PageProps<"/verbum">) {
   return (

@@ -12,6 +12,9 @@ export function normalizar(texto: string): string {
     .normalize("NFC"); // vuelve a juntar N + ~ → Ñ
 }
 
+// Cuántos intentos hay para adivinar la palabra.
+export const INTENTOS = 6;
+
 // ¿Es una sola letra válida del juego? (A–Z o Ñ, ya normalizada)
 export function esLetra(texto: string): boolean {
   return /^[A-ZÑ]$/.test(texto);

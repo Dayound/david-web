@@ -1,15 +1,20 @@
 "use server";
 
 import { retoDelDia } from "./palabras";
-import { colorear, normalizar, type Color } from "./texto";
+import { colorear, INTENTOS, normalizar, type Color } from "./texto";
 
 export type Respuesta =
-  | { ok: true; colores: Color[]; acertado: boolean }
+  | { ok: true; colores: Color[]; acertado: boolean; palabra?: string }
   | { ok: false; mensaje: string };
 
 // La cocina de VERBUM: recibe un intento, lo compara con la palabra del día
-// y devuelve solo los colores. La palabra nunca sale del servidor.
-export async function comprobarIntento(fecha: string, intento: string): Promise<Respuesta> {
+// y devuelve solo los colores. La palabra solo sale del servidor para
+// enseñarla cuando se falla el último intento.
+export async function comprobarIntento(
+  fecha: string,
+  intento: string,
+  numero: number, // qué intento es: 1, 2, … 6
+): Promise<Respuesta> {
   const reto = retoDelDia();
 
   // Si la página se abrió ayer y ya ha pasado la medianoche, la palabra ha cambiado.
@@ -23,5 +28,10 @@ export async function comprobarIntento(fecha: string, intento: string): Promise<
     return { ok: false, mensaje: `El intento tiene que tener ${reto.palabra.length} letras.` };
   }
 
-  return { ok: true, colores: colorear(texto, reto.palabra), acertado: texto === reto.palabra };
+  const acertado = texto === reto.palabra;
+  // Nota: el número de intento lo dice el navegador, así que alguien con
+  // conocimientos podría pedir la palabra antes de tiempo. Para un juego
+  // entre amigos vale; evitarlo del todo exigiría guardar cada partida en el servidor.
+  const palabra = !acertado && numero >= INTENTOS ? reto.palabra : undefined;
+  return { ok: true, colores: colorear(texto, reto.palabra), acertado, palabra };
 }

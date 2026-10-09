@@ -39,7 +39,7 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - [x] Tablero: 6 filas × N letras, con la pista arriba
 - [x] Teclado en pantalla (con Ñ) + teclado físico
 - [x] Comprobar un intento: verde / amarillo / gris, con letras repetidas bien contadas
-- [ ] Mensaje de victoria / derrota
+- [x] Mensaje de victoria / derrota
 - [ ] Guardar la partida del día en el navegador
 - [ ] Enlace desde la tarjeta VERBUM de la portada
 - [ ] Probar en móvil y modo claro/oscuro, PR y publicar
@@ -52,3 +52,4 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - 2026-10-09 (4): Lista de 8 retos escrita por David en app/verbum/palabras.ts (todas de 5–8 letras, revisadas). retoDelDia() elige el reto por fecha en hora de España; probado el cambio a medianoche.
 - 2026-10-09 (5): Tablero (6 filas × N casillas, se adapta a 5–8 letras) y teclado (pantalla con Ñ + teclado físico, tildes ignoradas). Probado por David en localhost. La palabra nunca llega al navegador: solo pista y longitud; palabras.ts lleva `import "server-only"` y normalizar() se movió a texto.ts. La comprobación de intentos se hará en el servidor.
 - 2026-10-09 (6): Colores verde/amarillo/gris calculados en el servidor (server action comprobarIntento, devuelve solo colores). Letras repetidas contadas bien, probado. El teclado también se pinta. Probado por David.
+- 2026-10-09 (7): Mensaje final arriba del tablero: "¡Acertaste!" con intentos usados, o "¡Casi!" con la palabra (el servidor solo la envía tras fallar el 6º intento). Textos provisionales escritos por Claude, David puede cambiarlos en MensajeFinal (juego.tsx).
