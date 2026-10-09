@@ -85,10 +85,13 @@ function Partida({ fecha, intentos, letras }: Props) {
     });
   }
 
+  // Al escribir la última letra de la fila, el intento se envía solo.
   function escribir(letra: string) {
-    if (bloqueado) return;
+    if (bloqueado || actual.length >= letras) return;
     setMensaje("");
-    setActual((a) => (a.length < letras ? a + letra : a));
+    const texto = actual + letra;
+    setActual(texto);
+    if (texto.length === letras) enviar(texto);
   }
 
   function borrar() {
@@ -97,13 +100,13 @@ function Partida({ fecha, intentos, letras }: Props) {
     setActual((a) => a.slice(0, -1));
   }
 
-  function enviar() {
+  // ENVIAR sigue sirviendo para reintentar si algo falló (por ejemplo, sin conexión).
+  function enviar(texto = actual) {
     if (bloqueado) return;
-    if (actual.length < letras) {
+    if (texto.length < letras) {
       setMensaje(`Faltan letras: la palabra tiene ${letras}.`);
       return;
     }
-    const texto = actual;
     const numero = enviados.length + 1;
     empezarComprobacion(async () => {
       const respuesta = await comprobarIntento(fecha, texto, numero);

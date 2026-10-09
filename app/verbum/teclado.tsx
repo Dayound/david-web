@@ -8,6 +8,25 @@ const FILAS = [
   ["ENVIAR", "Z", "X", "C", "V", "B", "N", "M", "BORRAR"],
 ];
 
+// La flecha de borrar dibujada (el símbolo ⌫ sale diminuto en muchos móviles).
+function IconoBorrar() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className="h-6 w-6"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M21 5H9l-6 7 6 7h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1z" />
+      <path d="M17 9l-6 6M11 9l6 6" />
+    </svg>
+  );
+}
+
 const SIN_USAR =
   "bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-400 dark:bg-zinc-800 dark:hover:bg-zinc-700 dark:active:bg-zinc-600";
 
@@ -39,9 +58,9 @@ export default function Teclado({
                 aria-label={tecla === "BORRAR" ? "Borrar" : tecla === "ENVIAR" ? "Enviar" : tecla}
                 className={`flex h-12 min-w-0 items-center justify-center rounded-md font-semibold transition-colors ${
                   color ? ESTILO_COLOR[color] : SIN_USAR
-                } ${especial ? "flex-[1.5] text-xs" : "flex-1 text-sm sm:text-base"}`}
+                } ${especial ? "flex-[1.6] text-xs" : "flex-1 text-sm sm:text-base"}`}
               >
-                {tecla === "BORRAR" ? "⌫" : tecla}
+                {tecla === "BORRAR" ? <IconoBorrar /> : tecla}
               </button>
             );
           })}
