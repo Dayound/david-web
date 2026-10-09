@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import { comprobarIntento } from "./acciones";
 import Tablero, { type Intento } from "./tablero";
 import Teclado from "./teclado";
@@ -8,27 +8,72 @@ import { esLetra, INTENTOS, normalizar, type Color } from "./texto";
 
 const PRIORIDAD: Record<Color, number> = { gris: 1, amarillo: 2, verde: 3 };
 
+// La partida guardada en el navegador (localStorage), una sola: la de hoy.
+type Partida = { fecha: string; enviados: Intento[]; palabra: string };
+const CLAVE = "verbum-partida";
+
+function leerPartida(): Partida | null {
+  try {
+    return JSON.parse(localStorage.getItem(CLAVE) ?? "null");
+  } catch {
+    return null; // modo privado, datos rotos…: se empieza de cero
+  }
+}
+
+function guardarPartida(partida: Partida) {
+  try {
+    localStorage.setItem(CLAVE, JSON.stringify(partida));
+  } catch {}
+}
+
+// La partida guardada solo sirve si es de hoy (y de esta palabra):
+// la de otro día se ignora, porque hoy toca otra palabra.
+function partidaDeHoy(fecha: string, letras: number): Partida {
+  const guardada = leerPartida();
+  if (guardada?.fecha === fecha && guardada.enviados.every((e) => e.texto.length === letras)) {
+    return guardada;
+  }
+  return { fecha, enviados: [], palabra: "" };
+}
+
+const sinCambios = () => () => {};
+
+type Props = { fecha: string; intentos: number; letras: number };
+
+// El servidor no puede ver el localStorage del navegador, así que primero
+// pinta el tablero vacío y, ya en el navegador, carga la partida guardada.
+export default function Juego(props: Props) {
+  const enNavegador = useSyncExternalStore(sinCambios, () => true, () => false);
+  if (!enNavegador) {
+    return (
+      <div className="flex flex-col gap-6">
+        <Tablero intentos={props.intentos} letras={props.letras} enviados={[]} actual="" />
+        <p className="min-h-6" />
+        <Teclado colores={{}} onLetra={() => {}} onBorrar={() => {}} onEnviar={() => {}} />
+      </div>
+    );
+  }
+  return <Partida {...props} />;
+}
+
 // La partida: guarda lo que se va escribiendo y lo pasa al tablero.
 // Funciona en el navegador porque tiene que reaccionar a cada tecla;
 // para saber los colores le pregunta al servidor, que es quien sabe la palabra.
-export default function Juego({
-  fecha,
-  intentos,
-  letras,
-}: {
-  fecha: string;
-  intentos: number;
-  letras: number;
-}) {
-  const [enviados, setEnviados] = useState<Intento[]>([]);
+function Partida({ fecha, intentos, letras }: Props) {
+  const [enviados, setEnviados] = useState(() => partidaDeHoy(fecha, letras).enviados);
+  const [palabra, setPalabra] = useState(() => partidaDeHoy(fecha, letras).palabra); // solo llega si se pierde
   const [actual, setActual] = useState("");
   const [mensaje, setMensaje] = useState("");
-  const [palabra, setPalabra] = useState(""); // solo llega si se pierde
   const [comprobando, empezarComprobacion] = useTransition();
 
   const acertado = enviados.some((e) => e.colores.every((c) => c === "verde"));
   const terminado = acertado || enviados.length >= intentos;
   const bloqueado = terminado || comprobando;
+
+  // Cada vez que se envía un intento, la partida se guarda en el navegador.
+  useEffect(() => {
+    guardarPartida({ fecha, enviados, palabra });
+  }, [fecha, enviados, palabra]);
 
   // El mejor color que ha sacado cada letra, para pintar el teclado.
   const coloresTeclado: Partial<Record<string, Color>> = {};
