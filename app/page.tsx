@@ -2,18 +2,21 @@ import Link from "next/link";
 import BotonTema from "./boton-tema";
 
 // Una tarjeta para cada idea de juego. Se escribe una vez y se usa tres veces:
-// eso es un componente.
+// eso es un componente. Si el juego ya existe (tiene "enlace"), la tarjeta
+// entera se puede pulsar para ir a jugar.
 function Idea({
   nombre,
   frase,
   nivel,
+  enlace,
 }: {
   nombre: string;
   frase: string;
   nivel: string;
+  enlace?: string;
 }) {
-  return (
-    <li className="rounded-xl border border-black/10 p-5 dark:border-white/15">
+  const contenido = (
+    <>
       <div className="flex items-baseline justify-between gap-4">
         <h3 className="text-lg font-semibold tracking-tight">{nombre}</h3>
         <span className="text-xs uppercase tracking-widest text-zinc-500">
@@ -21,6 +24,24 @@ function Idea({
         </span>
       </div>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">{frase}</p>
+      {enlace && <p className="mt-3 text-sm font-medium">Jugar →</p>}
+    </>
+  );
+
+  return (
+    <li>
+      {enlace ? (
+        <Link
+          href={enlace}
+          className="block rounded-xl border border-black/10 p-5 transition-colors hover:border-black/30 hover:bg-black/[0.03] dark:border-white/15 dark:hover:border-white/40 dark:hover:bg-white/[0.04]"
+        >
+          {contenido}
+        </Link>
+      ) : (
+        <div className="rounded-xl border border-black/10 p-5 dark:border-white/15">
+          {contenido}
+        </div>
+      )}
     </li>
   );
 }
@@ -64,6 +85,7 @@ export default function Home() {
           <Idea
             nombre="VERBUM"
             nivel="Nivel 1"
+            enlace="/verbum"
             frase="Una palabra al día, seis intentos. Abrir, jugar, descubrir la palabra."
           />
           <Idea

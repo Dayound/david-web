@@ -41,7 +41,7 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - [x] Comprobar un intento: verde / amarillo / gris, con letras repetidas bien contadas
 - [x] Mensaje de victoria / derrota
 - [x] Guardar la partida del día en el navegador
-- [ ] Enlace desde la tarjeta VERBUM de la portada
+- [x] Enlace desde la tarjeta VERBUM de la portada
 - [ ] Probar en móvil y modo claro/oscuro, PR y publicar
 
 ## Progress Notes
@@ -54,3 +54,4 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - 2026-10-09 (6): Colores verde/amarillo/gris calculados en el servidor (server action comprobarIntento, devuelve solo colores). Letras repetidas contadas bien, probado. El teclado también se pinta. Probado por David.
 - 2026-10-09 (7): Mensaje final arriba del tablero: "¡Acertaste!" con intentos usados, o "¡Casi!" con la palabra (el servidor solo la envía tras fallar el 6º intento). Textos provisionales escritos por Claude, David puede cambiarlos en MensajeFinal (juego.tsx).
 - 2026-10-09 (8): Partida del día guardada en localStorage ("verbum-partida"); la de otro día se ignora. Se carga solo en el navegador (useSyncExternalStore) para no chocar con el renderizado del servidor. Probado por David.
+- 2026-10-09 (9): Tarjeta VERBUM de la portada enlazada a /verbum (prop opcional `enlace` en Idea). Probado por David. Rama subida a GitHub; falta PR, vista previa y publicar.
