@@ -54,7 +54,7 @@ async function RetoDeHoy({ searchParams }: Pick<PageProps<"/verbum">, "searchPar
         <span className="text-zinc-500"> · {letras} letras</span>
       </p>
       <div className="mt-8">
-        <Juego intentos={INTENTOS} letras={letras} />
+        <Juego fecha={reto.fecha} intentos={INTENTOS} letras={letras} />
       </div>
     </>
   );
