@@ -52,7 +52,7 @@ export default function Home() {
           Qué hago
         </h2>
         <p className="mt-4 text-lg leading-8">
-          Probando, probando.
+          Estoy aprendiendo a trabajar con IA, desarrollando apps y webs con la ayuda de Claude.
         </p>
       </section>
 
