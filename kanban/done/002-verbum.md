@@ -2,7 +2,7 @@
 id: 002-verbum
 owner: claude
 branch: feat/002-verbum
-status: doing
+status: done
 created: 2026-10-09
 updated: 2026-10-09
 ---
@@ -42,7 +42,7 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - [x] Mensaje de victoria / derrota
 - [x] Guardar la partida del día en el navegador
 - [x] Enlace desde la tarjeta VERBUM de la portada
-- [ ] Probar en móvil y modo claro/oscuro, PR y publicar
+- [x] Probar en móvil y modo claro/oscuro, PR y publicar
 
 ## Progress Notes
 
@@ -56,3 +56,4 @@ Primer juego de la web (Nivel 1): adivinar la palabra del día en seis intentos.
 - 2026-10-09 (8): Partida del día guardada en localStorage ("verbum-partida"); la de otro día se ignora. Se carga solo en el navegador (useSyncExternalStore) para no chocar con el renderizado del servidor. Probado por David.
 - 2026-10-09 (9): Tarjeta VERBUM de la portada enlazada a /verbum (prop opcional `enlace` en Idea). Probado por David. Rama subida a GitHub; falta PR, vista previa y publicar.
 - 2026-10-09 (10): El PR no llegó a crearse (no se pulsó "Create pull request"). Cambios pedidos por David tras probar en el móvil, hechos en esta misma rama: botón de borrar más grande (icono SVG en lugar de ⌫) y envío automático al escribir la última letra. ENVIAR se queda para reintentar si falla.
+- 2026-10-09 (11): CERRADA. El PR en GitHub no llegó a crearse dos veces, así que a petición de David se fusionó en local (merge fca4f75) y se subió main. Comprobado en producción: /verbum responde con la pista del día y la portada enlaza al juego. Pendiente para otro día: entender qué pasa al crear el PR en GitHub; borrar la rama feat/002-verbum si David quiere.
