@@ -26,9 +26,9 @@ backlog → doing → rama → Pull Request → done.
 
 ## Checklist
 
-- [ ] Escribir el texto
-- [ ] Probarlo en localhost
-- [ ] Commit en una rama
+- [x] Escribir el texto
+- [x] Probarlo en localhost
+- [x] Commit en una rama
 - [ ] Pull Request y merge
 - [ ] Comprobar en la web publicada
 
@@ -36,3 +36,4 @@ backlog → doing → rama → Pull Request → done.
 
 - 2026-10-09: Creada.
 - 2026-10-09 (2): Empezada en la rama feat/001-texto-que-hago. Plan: David escribe el texto a mano en app/page.tsx, lo prueba en localhost y abre su primer Pull Request.
+- 2026-10-09 (3): Texto escrito por David a mano en app/page.tsx. Comprobado por él en localhost en modo claro y oscuro; `tsc` en verde. Primera versión guardada con la errata "desarollando": la cazamos en la revisión porque la pestaña tenía cambios sin guardar (●).
