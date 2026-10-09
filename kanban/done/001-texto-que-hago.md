@@ -2,7 +2,7 @@
 id: 001-texto-que-hago
 owner: self
 branch: feat/001-texto-que-hago
-status: doing
+status: done
 created: 2026-10-09
 updated: 2026-10-09
 ---
@@ -29,11 +29,12 @@ backlog → doing → rama → Pull Request → done.
 - [x] Escribir el texto
 - [x] Probarlo en localhost
 - [x] Commit en una rama
-- [ ] Pull Request y merge
-- [ ] Comprobar en la web publicada
+- [x] Pull Request y merge
+- [x] Comprobar en la web publicada
 
 ## Progress Notes
 
 - 2026-10-09: Creada.
 - 2026-10-09 (2): Empezada en la rama feat/001-texto-que-hago. Plan: David escribe el texto a mano en app/page.tsx, lo prueba en localhost y abre su primer Pull Request.
 - 2026-10-09 (3): Texto escrito por David a mano en app/page.tsx. Comprobado por él en localhost en modo claro y oscuro; `tsc` en verde. Primera versión guardada con la errata "desarollando": la cazamos en la revisión porque la pestaña tenía cambios sin guardar (●).
+- 2026-10-09 (4): CERRADA. PR #1 abierto por David desde la web de GitHub, revisado en la vista previa de Vercel (rama) y fusionado por él (merge a626289); rama borrada. Comprobado en producción: la portada muestra el texto nuevo y ya no aparece "Probando, probando.". Para recordar: las vistas previas de rama piden iniciar sesión en Vercel; la web pública no.
