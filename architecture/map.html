@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapa de arquitectura</title>
+<style>
+  :root { --bg:#fff; --fg:#18181b; --muted:#71717a; --line:#d4d4d8; --card:#fafafa; }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#0a0a0a; --fg:#ededed; --muted:#a1a1aa; --line:#3f3f46; --card:#18181b; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:24px 16px 64px; background:var(--bg); color:var(--fg);
+         font:15px/1.5 system-ui, sans-serif; }
+  main { max-width:1100px; margin:0 auto; }
+  h1 { margin:0; font-size:24px; }
+  h2 { margin:40px 0 12px; font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); }
+  .meta { color:var(--muted); margin-top:4px; }
+  .chips span { display:inline-block; margin:8px 6px 0 0; padding:2px 10px; border:1px solid var(--line); border-radius:999px; font-size:13px; }
+  .scroll { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:var(--card); }
+  svg text { fill:var(--fg); font-size:12px; }
+  svg .edge { stroke:var(--muted); fill:none; stroke-width:1.2; }
+  svg .edge-label { fill:var(--muted); font-size:11px; }
+  svg .group-title { font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:12px; }
+  .card { border:1px solid var(--line); border-radius:12px; padding:12px 16px; background:var(--card); }
+  .card h3 { margin:0 0 8px; font-size:15px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  td { padding:3px 0; border-top:1px solid var(--line); }
+  td.t { color:var(--muted); text-align:right; }
+  .method { display:inline-block; min-width:52px; font:600 12px ui-monospace, monospace; }
+  code { font:13px ui-monospace, monospace; }
+  .muted { color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1 id="title"></h1>
+  <div class="meta" id="updated"></div>
+  <div class="chips" id="stack"></div>
+
+  <h2>Componentes</h2>
+  <div class="scroll"><svg id="graph"></svg></div>
+
+  <h2>Modelo de datos</h2>
+  <div class="grid" id="entities"></div>
+  <div id="relationships" class="muted"></div>
+
+  <h2>Rutas y acciones</h2>
+  <div class="grid" id="routes"></div>
+</main>
+
+<script>
+// ---- DATA (regenerado desde architecture/data.json) ----
+const DATA = {
+  "meta": {
+    "project": "david-web",
+    "updated": "2026-10-09",
+    "stack": ["Next.js 16.4", "React 19.3", "TypeScript", "Tailwind CSS 4", "Supabase", "Vercel"]
+  },
+  "components": {
+    "groups": [
+      { "name": "Páginas", "color": "#4F46E5", "nodes": [
+        { "id": "layout", "label": "layout.tsx (tema inicial)" },
+        { "id": "home", "label": "/ Portada" },
+        { "id": "marcador", "label": "/marcador" } ] },
+      { "name": "Componentes", "color": "#0891B2", "nodes": [
+        { "id": "botonTema", "label": "BotonTema (cliente)" },
+        { "id": "idea", "label": "Idea (tarjeta)" },
+        { "id": "formulario", "label": "Formulario (cliente)" } ] },
+      { "name": "Servidor", "color": "#059669", "nodes": [
+        { "id": "leerTop10", "label": "leerTop10 (use cache)" },
+        { "id": "guardar", "label": "guardarPuntuacion (server action)" },
+        { "id": "clienteSb", "label": "lib/supabase.ts" } ] },
+      { "name": "Externo", "color": "#DC2626", "nodes": [
+        { "id": "supabase", "label": "Supabase (Postgres)" },
+        { "id": "vercel", "label": "Vercel (hosting)" } ] }
+    ],
+    "edges": [
+      { "from": "home", "to": "botonTema" },
+      { "from": "home", "to": "idea" },
+      { "from": "home", "to": "marcador", "label": "enlace" },
+      { "from": "marcador", "to": "botonTema" },
+      { "from": "marcador", "to": "formulario" },
+      { "from": "marcador", "to": "leerTop10" },
+      { "from": "formulario", "to": "guardar", "label": "envía" },
+      { "from": "guardar", "to": "leerTop10", "label": "updateTag" },
+      { "from": "leerTop10", "to": "clienteSb" },
+      { "from": "guardar", "to": "clienteSb" },
+      { "from": "clienteSb", "to": "supabase" }
+    ]
+  },
+  "dataModel": {
+    "entities": [
+      { "name": "puntuaciones", "fields": [
+        { "name": "id", "type": "int", "constraint": "PK" },
+        { "name": "nombre", "type": "text", "constraint": "1–30 car." },
+        { "name": "puntos", "type": "int", "constraint": "0–1.000.000" },
+        { "name": "fecha", "type": "timestamptz" } ] }
+    ],
+    "relationships": []
+  },
+  "apiRoutes": {
+    "groups": [
+      { "name": "Server Actions", "routes": [
+        { "method": "POST", "path": "/marcador (guardarPuntuacion)", "description": "Valida nombre y puntos e inserta en puntuaciones" } ] }
+    ]
+  }
+};
+// ---- END DATA ----
+
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+const $ = id => document.getElementById(id);
+
+$("title").textContent = DATA.meta.project;
+$("updated").textContent = "Actualizado: " + DATA.meta.updated;
+$("stack").innerHTML = DATA.meta.stack.map(s => `<span>${esc(s)}</span>`).join("");
+
+// Grafo: una columna por grupo, las flechas van de un nodo a otro.
+(function graph() {
+  const COL_W = 250, NODE_W = 210, NODE_H = 36, GAP = 22, TOP = 50, PAD = 20;
+  const groups = DATA.components.groups;
+  const pos = {};
+  let maxRows = 0;
+  groups.forEach((g, gi) => {
+    maxRows = Math.max(maxRows, g.nodes.length);
+    g.nodes.forEach((n, ni) => {
+      pos[n.id] = { x: PAD + gi * COL_W, y: TOP + ni * (NODE_H + GAP), color: g.color, label: n.label };
+    });
+  });
+  const W = PAD * 2 + (groups.length - 1) * COL_W + NODE_W;
+  const H = TOP + maxRows * (NODE_H + GAP) + PAD;
+  const svg = $("graph");
+  svg.setAttribute("width", W);
+  svg.setAttribute("height", H);
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+
+  let out = `<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+    <path d="M0,0 L10,5 L0,10 z" fill="currentColor" style="color:var(--muted)"/></marker></defs>`;
+
+  groups.forEach((g, gi) => {
+    out += `<text class="group-title" x="${PAD + gi * COL_W}" y="28" style="fill:${g.color}">${esc(g.name)}</text>`;
+  });
+
+  DATA.components.edges.forEach(e => {
+    const a = pos[e.from], b = pos[e.to];
+    if (!a || !b) return;
+    let d, lx, ly;
+    if (a.x === b.x) {
+      // Misma columna: curva por la derecha.
+      const x = a.x + NODE_W, y1 = a.y + NODE_H / 2, y2 = b.y + NODE_H / 2;
+      d = `M${x},${y1} C${x + 30},${y1} ${x + 30},${y2} ${x + 2},${y2}`;
+      lx = x + 26; ly = (y1 + y2) / 2;
+    } else {
+      const fwd = b.x > a.x;
+      const x1 = fwd ? a.x + NODE_W : a.x, x2 = fwd ? b.x - 2 : b.x + NODE_W + 2;
+      const y1 = a.y + NODE_H / 2, y2 = b.y + NODE_H / 2, mx = (x1 + x2) / 2;
+      d = `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`;
+      lx = mx; ly = (y1 + y2) / 2 - 4;
+    }
+    out += `<path class="edge" d="${d}" marker-end="url(#arrow)"/>`;
+    if (e.label) out += `<text class="edge-label" x="${lx}" y="${ly}" text-anchor="middle">${esc(e.label)}</text>`;
+  });
+
+  Object.values(pos).forEach(p => {
+    out += `<rect x="${p.x}" y="${p.y}" width="${NODE_W}" height="${NODE_H}" rx="8"
+      style="fill:var(--bg);stroke:${p.color};stroke-width:1.5"/>
+      <text x="${p.x + 12}" y="${p.y + NODE_H / 2 + 4}">${esc(p.label)}</text>`;
+  });
+  svg.innerHTML = out;
+})();
+
+$("entities").innerHTML = DATA.dataModel.entities.map(en => `
+  <div class="card"><h3><code>${esc(en.name)}</code></h3><table>
+  ${en.fields.map(f => `<tr><td><code>${esc(f.name)}</code></td><td class="t">${esc(f.type)}${f.constraint ? " · " + esc(f.constraint) : ""}</td></tr>`).join("")}
+  </table></div>`).join("");
+
+$("relationships").innerHTML = DATA.dataModel.relationships.length
+  ? DATA.dataModel.relationships.map(r => `<p><code>${esc(r.from)}</code> → <code>${esc(r.to)}</code> · ${esc(r.type)} · ${esc(r.label)}</p>`).join("")
+  : "<p>Sin relaciones (una sola tabla).</p>";
+
+$("routes").innerHTML = DATA.apiRoutes.groups.map(g => `
+  <div class="card"><h3>${esc(g.name)}</h3>
+  ${g.routes.map(r => `<p><span class="method">${esc(r.method)}</span><code>${esc(r.path)}</code><br><span class="muted">${esc(r.description)}</span></p>`).join("")}
+  </div>`).join("");
+</script>
+</body>
+</html>

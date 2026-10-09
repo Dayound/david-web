@@ -1,0 +1,83 @@
+{
+  "meta": {
+    "project": "david-web",
+    "updated": "2026-10-09",
+    "stack": ["Next.js 16.4", "React 19.3", "TypeScript", "Tailwind CSS 4", "Supabase", "Vercel"]
+  },
+  "components": {
+    "groups": [
+      {
+        "name": "Páginas",
+        "color": "#4F46E5",
+        "nodes": [
+          { "id": "layout", "label": "layout.tsx (tema inicial)" },
+          { "id": "home", "label": "/ Portada" },
+          { "id": "marcador", "label": "/marcador" }
+        ]
+      },
+      {
+        "name": "Componentes",
+        "color": "#0891B2",
+        "nodes": [
+          { "id": "botonTema", "label": "BotonTema (cliente)" },
+          { "id": "idea", "label": "Idea (tarjeta)" },
+          { "id": "formulario", "label": "Formulario (cliente)" }
+        ]
+      },
+      {
+        "name": "Servidor",
+        "color": "#059669",
+        "nodes": [
+          { "id": "leerTop10", "label": "leerTop10 (use cache)" },
+          { "id": "guardar", "label": "guardarPuntuacion (server action)" },
+          { "id": "clienteSb", "label": "lib/supabase.ts" }
+        ]
+      },
+      {
+        "name": "Externo",
+        "color": "#DC2626",
+        "nodes": [
+          { "id": "supabase", "label": "Supabase (Postgres)" },
+          { "id": "vercel", "label": "Vercel (hosting)" }
+        ]
+      }
+    ],
+    "edges": [
+      { "from": "home", "to": "botonTema" },
+      { "from": "home", "to": "idea" },
+      { "from": "home", "to": "marcador", "label": "enlace" },
+      { "from": "marcador", "to": "botonTema" },
+      { "from": "marcador", "to": "formulario" },
+      { "from": "marcador", "to": "leerTop10" },
+      { "from": "formulario", "to": "guardar", "label": "envía" },
+      { "from": "guardar", "to": "leerTop10", "label": "updateTag" },
+      { "from": "leerTop10", "to": "clienteSb" },
+      { "from": "guardar", "to": "clienteSb" },
+      { "from": "clienteSb", "to": "supabase" }
+    ]
+  },
+  "dataModel": {
+    "entities": [
+      {
+        "name": "puntuaciones",
+        "fields": [
+          { "name": "id", "type": "int", "constraint": "PK" },
+          { "name": "nombre", "type": "text", "constraint": "1–30 car." },
+          { "name": "puntos", "type": "int", "constraint": "0–1.000.000" },
+          { "name": "fecha", "type": "timestamptz" }
+        ]
+      }
+    ],
+    "relationships": []
+  },
+  "apiRoutes": {
+    "groups": [
+      {
+        "name": "Server Actions",
+        "routes": [
+          { "method": "POST", "path": "/marcador (guardarPuntuacion)", "description": "Valida nombre y puntos e inserta en puntuaciones" }
+        ]
+      }
+    ]
+  }
+}
