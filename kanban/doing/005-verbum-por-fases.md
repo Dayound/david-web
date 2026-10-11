@@ -39,7 +39,7 @@ Convertir VERBUM en una escalera de palabras encadenadas, cada fase con un inten
 - [x] Resolver las dudas pendientes (rangos en vez de puntos; marcador en el navegador)
 - [x] Escaleras de palabras (8 días × 6 palabras)
 - [x] Fases en el juego: escalera, intentos que bajan, se acaba al fallar
-- [ ] Marcador personal (racha, mejor fase, rangos)
+- [x] Marcador personal (racha, mejor fase, rangos)
 
 ## Progress Notes
 
@@ -52,3 +52,4 @@ Convertir VERBUM en una escalera de palabras encadenadas, cada fase con un inten
 - 2026-10-11 (7): Probado por David: funciona bien. Siguiente: marcador personal.
 - 2026-10-11 (8): Marcador personal programado (estadisticas.ts + marcador.tsx), guardado en localStorage "verbum-estadisticas". Se apunta al terminar la partida (una vez por día). Racha, mejor fase, escaleras completas y rango con logo (emoji provisional). Lógica probada con un script: racha, día repetido, día saltado y límites de los rangos. Falta que David lo pruebe.
 - 2026-10-11 (9): Marcador probado por David: funciona. Pide darle más protagonismo y ponerlo arriba.
+- 2026-10-11 (10): Marcador convertido en insignia con los colores del rango y movido arriba del todo (antes de la pista). Probado por David. Idea de compartir apuntada aparte en #006.

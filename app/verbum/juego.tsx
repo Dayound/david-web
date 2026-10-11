@@ -54,8 +54,8 @@ function partidaDeHoy(fecha: string, letras: number[]): Partida {
 
 const sinCambios = () => () => {};
 
-// letras: cuántas letras tiene la palabra de cada fase (una por fase)
-type Props = { fecha: string; letras: number[] };
+// pista: la temática del día · letras: cuántas letras tiene la palabra de cada fase
+type Props = { fecha: string; pista: string; letras: number[] };
 
 // El servidor no puede ver el localStorage del navegador, así que primero
 // pinta el tablero vacío y, ya en el navegador, carga la partida guardada.
@@ -64,6 +64,7 @@ export default function Juego(props: Props) {
   if (!enNavegador) {
     return (
       <div className="flex flex-col gap-6">
+        <Pista pista={props.pista} />
         <Escalera total={props.letras.length} fase={1} resueltas={[]} />
         <Tablero intentos={intentosDeFase(1)} letras={props.letras[0]} enviados={[]} actual="" />
         <p className="min-h-6" />
@@ -77,7 +78,7 @@ export default function Juego(props: Props) {
 // La partida: guarda lo que se va escribiendo y lo pasa al tablero.
 // Funciona en el navegador porque tiene que reaccionar a cada tecla;
 // para saber los colores le pregunta al servidor, que es quien sabe las palabras.
-function Partida({ fecha, letras: letrasPorFase }: Props) {
+function Partida({ fecha, pista, letras: letrasPorFase }: Props) {
   const [partida, setPartida] = useState(() => partidaDeHoy(fecha, letrasPorFase));
   const [actual, setActual] = useState("");
   const [mensaje, setMensaje] = useState("");
@@ -188,6 +189,8 @@ function Partida({ fecha, letras: letrasPorFase }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
+      <Marcador estadisticas={estadisticas} hoy={fecha} fases={total} />
+      <Pista pista={pista} />
       <Escalera total={total} fase={fase} resueltas={resueltas} />
 
       {(perdido || completado) && (
@@ -229,9 +232,15 @@ function Partida({ fecha, letras: letrasPorFase }: Props) {
         onBorrar={borrar}
         onEnviar={enviar}
       />
-
-      <Marcador estadisticas={estadisticas} hoy={fecha} fases={total} />
     </div>
+  );
+}
+
+function Pista({ pista }: { pista: string }) {
+  return (
+    <p className="text-center text-zinc-600 dark:text-zinc-400">
+      Pista de hoy: <span className="font-semibold text-foreground">{pista}</span>
+    </p>
   );
 }
 

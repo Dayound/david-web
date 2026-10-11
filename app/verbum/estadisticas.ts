@@ -10,11 +10,12 @@ export type Estadisticas = {
 
 // Los rangos, según las veces que has completado la escalera entera.
 // Para añadir uno, ponlo en su sitio de la lista (de menos a más).
+// estilo: los colores de su insignia (degradado de fondo y color del texto).
 export const RANGOS = [
-  { nombre: "Bronce", logo: "🥉", desde: 1 },
-  { nombre: "Plata", logo: "🥈", desde: 5 },
-  { nombre: "Oro", logo: "🥇", desde: 20 },
-  { nombre: "Diamante", logo: "💎", desde: 100 },
+  { nombre: "Bronce", logo: "🥉", desde: 1, estilo: "from-amber-800 to-orange-400 text-white" },
+  { nombre: "Plata", logo: "🥈", desde: 5, estilo: "from-slate-500 to-slate-200 text-slate-950" },
+  { nombre: "Oro", logo: "🥇", desde: 20, estilo: "from-yellow-600 to-amber-300 text-amber-950" },
+  { nombre: "Diamante", logo: "💎", desde: 100, estilo: "from-indigo-600 to-cyan-400 text-white" },
 ];
 
 // ---------------------------------------------------------------------------

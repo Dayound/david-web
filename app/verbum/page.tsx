@@ -45,13 +45,8 @@ async function RetoDeHoy({ searchParams }: Pick<PageProps<"/verbum">, "searchPar
   // Al navegador solo le pasamos la pista y cuántas letras tiene cada palabra,
   // nunca las palabras.
   return (
-    <>
-      <p className="mt-6 text-center text-zinc-600 dark:text-zinc-400">
-        Pista de hoy: <span className="font-semibold text-foreground">{reto.pista}</span>
-      </p>
-      <div className="mt-6">
-        <Juego fecha={reto.fecha} letras={letras} />
-      </div>
-    </>
+    <div className="mt-8">
+      <Juego fecha={reto.fecha} pista={reto.pista} letras={letras} />
+    </div>
   );
 }
