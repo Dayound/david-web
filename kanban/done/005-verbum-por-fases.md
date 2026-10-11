@@ -2,7 +2,7 @@
 id: 005-verbum-por-fases
 owner: claude
 branch: feat/005-verbum-por-fases
-status: doing
+status: done
 created: 2026-10-11
 updated: 2026-10-11
 ---
@@ -53,3 +53,4 @@ Convertir VERBUM en una escalera de palabras encadenadas, cada fase con un inten
 - 2026-10-11 (8): Marcador personal programado (estadisticas.ts + marcador.tsx), guardado en localStorage "verbum-estadisticas". Se apunta al terminar la partida (una vez por día). Racha, mejor fase, escaleras completas y rango con logo (emoji provisional). Lógica probada con un script: racha, día repetido, día saltado y límites de los rangos. Falta que David lo pruebe.
 - 2026-10-11 (9): Marcador probado por David: funciona. Pide darle más protagonismo y ponerlo arriba.
 - 2026-10-11 (10): Marcador convertido en insignia con los colores del rango y movido arriba del todo (antes de la pista). Probado por David. Idea de compartir apuntada aparte en #006.
+- 2026-10-11 (11): CERRADA. Build OK. A petición de David (estaba cenando) se fusionó en local en main y se subió, sin PR. Practicar el PR desde GitHub queda para la próxima.

@@ -15,6 +15,7 @@ Web personal en **Next.js 16.4 (App Router) + React 19.3**, TypeScript y Tailwin
 
 <!-- AI appends here during work. Cleared when map is regenerated. -->
 - 2026-10-09: Nueva página /verbum (Juego, Tablero, Teclado como componentes de cliente; retoDelDia con io() en servidor) + server action comprobarIntento (lee palabras.ts, server-only). Portada enlaza a /verbum. Partida guardada en localStorage.
+- 2026-10-11: VERBUM por fases: palabras.ts pasa a escaleras { pista, palabras[] }; comprobarIntento recibe la fase. Nuevo marcador personal (estadisticas.ts + marcador.tsx, cliente) guardado en localStorage "verbum-estadisticas".
 
 ---
 
