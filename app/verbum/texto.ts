@@ -12,8 +12,13 @@ export function normalizar(texto: string): string {
     .normalize("NFC"); // vuelve a juntar N + ~ → Ñ
 }
 
-// Cuántos intentos hay para adivinar la palabra.
-export const INTENTOS = 6;
+// Cuántas fases puede tener un día como mucho.
+export const FASES = 6;
+
+// Cuántos intentos hay en cada fase: 6 en la 1.ª, 5 en la 2.ª… 1 en la 6.ª.
+export function intentosDeFase(fase: number): number {
+  return FASES + 1 - fase;
+}
 
 // ¿Es una sola letra válida del juego? (A–Z o Ñ, ya normalizada)
 export function esLetra(texto: string): boolean {
