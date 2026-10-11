@@ -2,6 +2,8 @@
 
 import { useEffect, useState, useSyncExternalStore, useTransition } from "react";
 import { comprobarIntento } from "./acciones";
+import { apuntarPartida, leerEstadisticas } from "./estadisticas";
+import Marcador from "./marcador";
 import Tablero, { type Intento } from "./tablero";
 import Teclado from "./teclado";
 import { esLetra, intentosDeFase, normalizar, type Color } from "./texto";
@@ -79,6 +81,7 @@ function Partida({ fecha, letras: letrasPorFase }: Props) {
   const [partida, setPartida] = useState(() => partidaDeHoy(fecha, letrasPorFase));
   const [actual, setActual] = useState("");
   const [mensaje, setMensaje] = useState("");
+  const [estadisticas, setEstadisticas] = useState(leerEstadisticas);
   const [comprobando, empezarComprobacion] = useTransition();
 
   const { fase, resueltas, enviados, palabra } = partida;
@@ -142,6 +145,13 @@ function Partida({ fecha, letras: letrasPorFase }: Props) {
         palabra: respuesta.palabra ?? p.palabra,
       }));
       setActual("");
+
+      // Si la partida del día acaba aquí (por perder o por completar la
+      // escalera), se apunta en el marcador personal.
+      const completada = respuesta.acertado && fase === total;
+      if (completada || (!respuesta.acertado && numero >= intentos)) {
+        setEstadisticas(apuntarPartida(fecha, completada ? fase : fase - 1, completada));
+      }
     });
   }
 
@@ -219,6 +229,8 @@ function Partida({ fecha, letras: letrasPorFase }: Props) {
         onBorrar={borrar}
         onEnviar={enviar}
       />
+
+      <Marcador estadisticas={estadisticas} hoy={fecha} fases={total} />
     </div>
   );
 }
