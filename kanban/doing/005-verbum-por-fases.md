@@ -1,8 +1,8 @@
 ---
 id: 005-verbum-por-fases
 owner: claude
-branch:
-status: backlog
+branch: feat/005-verbum-por-fases
+status: doing
 created: 2026-10-11
 updated: 2026-10-11
 ---
@@ -37,10 +37,16 @@ Convertir VERBUM en una escalera de palabras encadenadas, cada fase con un inten
 
 - [x] Decidir las reglas principales
 - [x] Resolver las dudas pendientes (rangos en vez de puntos; marcador en el navegador)
-- [ ] David escribe las primeras escaleras de palabras
+- [x] Escaleras de palabras (8 días × 6 palabras)
+- [x] Fases en el juego: escalera, intentos que bajan, se acaba al fallar
+- [ ] Marcador personal (racha, mejor fase, rangos)
 
 ## Progress Notes
 
 - 2026-10-11: Creada.
 - 2026-10-11 (2): Reglas principales decididas por David (ver Context / Notes).
 - 2026-10-11 (3): Rangos (bronce/plata/oro/diamante) en lugar de puntos x20. Marcador personal solo en el navegador.
+- 2026-10-11 (4): Empezada en la rama feat/005-verbum-por-fases sin esperar a Jesús (David lo pidió). Primer paso: David escribe las escaleras de 6 palabras en palabras.ts.
+- 2026-10-11 (5): Fases programadas. palabras.ts pasa a { pista, palabras: [...] } (las de David quedan como fase 1; la escalera de "animales" es PROVISIONAL de Claude, para probar). El servidor comprueba la palabra de cada fase; al navegador solo llegan las longitudes. Escalera arriba, botón "Siguiente fase", fin de partida al fallar. tsc y lint OK. Falta que David lo pruebe.
+- 2026-10-11 (6): David pasó sus escaleras como ejemplo y dio libertad para mejorarlas. Claude las completó: 8 días × 6 palabras, todas de 5–8 letras (comprobado). Se mantiene el orden de los días; hoy toca "animales".
+- 2026-10-11 (7): Probado por David: funciona bien. Siguiente: marcador personal.

@@ -4,7 +4,6 @@ import { io } from "next/cache";
 import BotonTema from "../boton-tema";
 import { retoDelDia } from "./palabras";
 import Juego from "./juego";
-import { INTENTOS } from "./texto";
 
 export const metadata = { title: "VERBUM · David Villalba" };
 
@@ -34,26 +33,24 @@ export default function Verbum({ searchParams }: PageProps<"/verbum">) {
 async function RetoDeHoy({ searchParams }: Pick<PageProps<"/verbum">, "searchParams">) {
   await io();
   const reto = retoDelDia();
-  let letras = reto.palabra.length;
+  let letras = reto.palabras.map((p) => p.length);
 
   // Solo en tu ordenador: /verbum?letras=8 enseña el tablero con 8 casillas
-  // para probar cómo se ve. En la web publicada no hace nada.
+  // en todas las fases para probar cómo se ve. En la web publicada no hace nada.
   if (process.env.NODE_ENV === "development") {
     const prueba = Number((await searchParams).letras);
-    if (prueba >= 5 && prueba <= 8) letras = prueba;
+    if (prueba >= 5 && prueba <= 8) letras = letras.map(() => prueba);
   }
 
-  // Al navegador solo le pasamos la pista y cuántas letras tiene la palabra,
-  // nunca la palabra.
+  // Al navegador solo le pasamos la pista y cuántas letras tiene cada palabra,
+  // nunca las palabras.
   return (
     <>
       <p className="mt-6 text-center text-zinc-600 dark:text-zinc-400">
-        Pista de hoy:{" "}
-        <span className="font-semibold text-foreground">{reto.pista}</span>
-        <span className="text-zinc-500"> · {letras} letras</span>
+        Pista de hoy: <span className="font-semibold text-foreground">{reto.pista}</span>
       </p>
-      <div className="mt-8">
-        <Juego fecha={reto.fecha} intentos={INTENTOS} letras={letras} />
+      <div className="mt-6">
+        <Juego fecha={reto.fecha} letras={letras} />
       </div>
     </>
   );

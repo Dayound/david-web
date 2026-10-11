@@ -4,12 +4,20 @@ import { useEffect, useState, useSyncExternalStore, useTransition } from "react"
 import { comprobarIntento } from "./acciones";
 import Tablero, { type Intento } from "./tablero";
 import Teclado from "./teclado";
-import { esLetra, INTENTOS, normalizar, type Color } from "./texto";
+import { esLetra, intentosDeFase, normalizar, type Color } from "./texto";
 
 const PRIORIDAD: Record<Color, number> = { gris: 1, amarillo: 2, verde: 3 };
 
 // La partida guardada en el navegador (localStorage), una sola: la de hoy.
-type Partida = { fecha: string; enviados: Intento[]; palabra: string };
+// fase: en la que estás (1, 2, …) · resueltas: las palabras de las fases ya superadas
+// enviados: los intentos de la fase actual · palabra: solo llega si se pierde
+type Partida = {
+  fecha: string;
+  fase: number;
+  resueltas: string[];
+  enviados: Intento[];
+  palabra: string;
+};
 const CLAVE = "verbum-partida";
 
 function leerPartida(): Partida | null {
@@ -26,19 +34,26 @@ function guardarPartida(partida: Partida) {
   } catch {}
 }
 
-// La partida guardada solo sirve si es de hoy (y de esta palabra):
-// la de otro día se ignora, porque hoy toca otra palabra.
-function partidaDeHoy(fecha: string, letras: number): Partida {
-  const guardada = leerPartida();
-  if (guardada?.fecha === fecha && guardada.enviados.every((e) => e.texto.length === letras)) {
-    return guardada;
+// La partida guardada solo sirve si es de hoy (y de estas palabras):
+// la de otro día, o la del VERBUM de antes de las fases, se ignora.
+function partidaDeHoy(fecha: string, letras: number[]): Partida {
+  const g = leerPartida();
+  if (
+    g?.fecha === fecha &&
+    Array.isArray(g.resueltas) &&
+    g.fase >= 1 &&
+    g.fase <= letras.length &&
+    g.enviados.every((e) => e.texto.length === letras[g.fase - 1])
+  ) {
+    return g;
   }
-  return { fecha, enviados: [], palabra: "" };
+  return { fecha, fase: 1, resueltas: [], enviados: [], palabra: "" };
 }
 
 const sinCambios = () => () => {};
 
-type Props = { fecha: string; intentos: number; letras: number };
+// letras: cuántas letras tiene la palabra de cada fase (una por fase)
+type Props = { fecha: string; letras: number[] };
 
 // El servidor no puede ver el localStorage del navegador, así que primero
 // pinta el tablero vacío y, ya en el navegador, carga la partida guardada.
@@ -47,7 +62,8 @@ export default function Juego(props: Props) {
   if (!enNavegador) {
     return (
       <div className="flex flex-col gap-6">
-        <Tablero intentos={props.intentos} letras={props.letras} enviados={[]} actual="" />
+        <Escalera total={props.letras.length} fase={1} resueltas={[]} />
+        <Tablero intentos={intentosDeFase(1)} letras={props.letras[0]} enviados={[]} actual="" />
         <p className="min-h-6" />
         <Teclado colores={{}} onLetra={() => {}} onBorrar={() => {}} onEnviar={() => {}} />
       </div>
@@ -58,24 +74,30 @@ export default function Juego(props: Props) {
 
 // La partida: guarda lo que se va escribiendo y lo pasa al tablero.
 // Funciona en el navegador porque tiene que reaccionar a cada tecla;
-// para saber los colores le pregunta al servidor, que es quien sabe la palabra.
-function Partida({ fecha, intentos, letras }: Props) {
-  const [enviados, setEnviados] = useState(() => partidaDeHoy(fecha, letras).enviados);
-  const [palabra, setPalabra] = useState(() => partidaDeHoy(fecha, letras).palabra); // solo llega si se pierde
+// para saber los colores le pregunta al servidor, que es quien sabe las palabras.
+function Partida({ fecha, letras: letrasPorFase }: Props) {
+  const [partida, setPartida] = useState(() => partidaDeHoy(fecha, letrasPorFase));
   const [actual, setActual] = useState("");
   const [mensaje, setMensaje] = useState("");
   const [comprobando, empezarComprobacion] = useTransition();
 
-  const acertado = enviados.some((e) => e.colores.every((c) => c === "verde"));
-  const terminado = acertado || enviados.length >= intentos;
-  const bloqueado = terminado || comprobando;
+  const { fase, resueltas, enviados, palabra } = partida;
+  const total = letrasPorFase.length;
+  const letras = letrasPorFase[fase - 1];
+  const intentos = intentosDeFase(fase);
 
-  // Cada vez que se envía un intento, la partida se guarda en el navegador.
+  const filaGanadora = enviados.find((e) => e.colores.every((c) => c === "verde"));
+  const perdido = !filaGanadora && enviados.length >= intentos;
+  const completado = !!filaGanadora && fase === total;
+  const faseSuperada = !!filaGanadora && fase < total; // esperando a pasar a la siguiente
+  const bloqueado = perdido || completado || faseSuperada || comprobando;
+
+  // Cada cambio en la partida se guarda en el navegador.
   useEffect(() => {
-    guardarPartida({ fecha, enviados, palabra });
-  }, [fecha, enviados, palabra]);
+    guardarPartida(partida);
+  }, [partida]);
 
-  // El mejor color que ha sacado cada letra, para pintar el teclado.
+  // El mejor color que ha sacado cada letra en esta fase, para pintar el teclado.
   const coloresTeclado: Partial<Record<string, Color>> = {};
   for (const e of enviados) {
     e.colores.forEach((color, i) => {
@@ -109,15 +131,30 @@ function Partida({ fecha, intentos, letras }: Props) {
     }
     const numero = enviados.length + 1;
     empezarComprobacion(async () => {
-      const respuesta = await comprobarIntento(fecha, texto, numero);
+      const respuesta = await comprobarIntento(fecha, fase, texto, numero);
       if (!respuesta.ok) {
         setMensaje(respuesta.mensaje);
         return;
       }
-      setEnviados((e) => [...e, { texto, colores: respuesta.colores }]);
+      setPartida((p) => ({
+        ...p,
+        enviados: [...p.enviados, { texto, colores: respuesta.colores }],
+        palabra: respuesta.palabra ?? p.palabra,
+      }));
       setActual("");
-      if (respuesta.palabra) setPalabra(respuesta.palabra);
     });
+  }
+
+  // Pasa a la fase siguiente: la palabra acertada se apunta en la escalera.
+  function siguienteFase() {
+    if (!filaGanadora) return;
+    setPartida((p) => ({
+      ...p,
+      fase: p.fase + 1,
+      resueltas: [...p.resueltas, filaGanadora.texto],
+      enviados: [],
+    }));
+    setMensaje("");
   }
 
   // El teclado del ordenador: letras (con o sin tilde), Retroceso y Enter.
@@ -126,7 +163,8 @@ function Partida({ fecha, intentos, letras }: Props) {
       if (e.ctrlKey || e.metaKey || e.altKey) return;
       if (e.key === "Enter") {
         e.preventDefault();
-        enviar();
+        if (faseSuperada) siguienteFase();
+        else enviar();
       } else if (e.key === "Backspace") {
         borrar();
       } else {
@@ -140,13 +178,36 @@ function Partida({ fecha, intentos, letras }: Props) {
 
   return (
     <div className="flex flex-col gap-6">
-      {terminado && (
-        <MensajeFinal acertado={acertado} usados={enviados.length} palabra={palabra} />
+      <Escalera total={total} fase={fase} resueltas={resueltas} />
+
+      {(perdido || completado) && (
+        <MensajeFinal completado={completado} fase={fase} total={total} palabra={palabra} />
       )}
+
+      {faseSuperada && (
+        <div role="status" className="rounded-xl border-2 border-green-600 p-5 text-center">
+          <p className="text-2xl font-semibold tracking-tight">¡Fase {fase} superada!</p>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-400">
+            La siguiente tiene un intento menos: {intentosDeFase(fase + 1)}.
+          </p>
+          <button
+            type="button"
+            onClick={siguienteFase}
+            className="mt-4 rounded-lg bg-foreground px-5 py-2.5 font-semibold text-background hover:opacity-90"
+          >
+            Siguiente fase →
+          </button>
+        </div>
+      )}
+
+      <p className="text-center text-sm text-zinc-500">
+        Fase {fase} de {total} · {letras} letras · {intentos}{" "}
+        {intentos === 1 ? "intento" : "intentos"}
+      </p>
 
       <Tablero intentos={intentos} letras={letras} enviados={enviados} actual={actual} />
 
-      {!terminado && (
+      {!bloqueado && (
         <p aria-live="polite" className="min-h-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
           {comprobando ? "Comprobando…" : mensaje}
         </p>
@@ -162,36 +223,65 @@ function Partida({ fecha, intentos, letras }: Props) {
   );
 }
 
-// El cartel del final de la partida: has ganado (y en cuántos intentos)
-// o has perdido (y cuál era la palabra).
+// La escalera del día: las palabras ya acertadas, la fase actual y las que faltan.
+function Escalera({
+  total,
+  fase,
+  resueltas,
+}: {
+  total: number;
+  fase: number;
+  resueltas: string[];
+}) {
+  if (total === 1) return null; // un día de una sola palabra no tiene escalera
+  return (
+    <ol className="flex flex-wrap justify-center gap-2 text-sm font-semibold tracking-widest">
+      {Array.from({ length: total }, (_, i) => {
+        const resuelta = resueltas[i];
+        const estilo = resuelta
+          ? "border-transparent bg-green-600 text-white"
+          : i === fase - 1
+            ? "border-foreground"
+            : "border-black/15 text-zinc-400 dark:border-white/20";
+        return (
+          <li key={i} className={`rounded-md border-2 px-2.5 py-1 ${estilo}`}>
+            {resuelta ?? i + 1}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+// El cartel del final de la partida: has completado la escalera
+// o te has quedado en una fase (y cuál era la palabra).
 function MensajeFinal({
-  acertado,
-  usados,
+  completado,
+  fase,
+  total,
   palabra,
 }: {
-  acertado: boolean;
-  usados: number;
+  completado: boolean;
+  fase: number;
+  total: number;
   palabra: string;
 }) {
   return (
     <div
       role="status"
       className={`rounded-xl border-2 p-5 text-center ${
-        acertado ? "border-green-600" : "border-black/15 dark:border-white/20"
+        completado ? "border-green-600" : "border-black/15 dark:border-white/20"
       }`}
     >
       <p className="text-2xl font-semibold tracking-tight">
-        {acertado ? "¡Acertaste!" : "¡Casi!"}
+        {completado ? "¡Escalera completa!" : "¡Casi!"}
       </p>
       <p className="mt-2 text-zinc-600 dark:text-zinc-400">
-        {acertado ? (
-          usados === 1 ? (
-            "A la primera. Impresionante."
-          ) : (
-            `Lo has descubierto en ${usados} de ${INTENTOS} intentos.`
-          )
+        {completado ? (
+          total === 1 ? "Lo has descubierto." : `Has superado las ${total} fases.`
         ) : (
           <>
+            {total > 1 && `Te has quedado en la fase ${fase} de ${total}. `}
             La palabra era{" "}
             <span className="font-bold tracking-widest text-foreground">{palabra}</span>.
           </>
